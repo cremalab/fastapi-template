@@ -13,7 +13,7 @@
 ### 🔌 Integrations
 Integrations(any external service ie AWS, Auth0, etc) to be documented here
 
-## 🏗 Template Instructions (**Remove once configured and serving as project repo**) 
+## 🚧 Template Instructions (**Remove once configured and serving as project repo**) 
 1. Rename all instances of `database_name` and `app_name` to desired name
 2. Before running, delete all `alembic/versions/X...` files (otherwise you will have to fix the alembic heads)-- these are just here for example
 3. Delete any example.py files as needed. These are here to serve as a template for how files/code should be standardized
@@ -28,11 +28,7 @@ Integrations(any external service ie AWS, Auth0, etc) to be documented here
 ENVIRONMENT=   #Set to "DEV" or something other than "PRODUCTION" to enable reloading
 
 #Update these as appropriate for the project
-
-POSTGRES_USER=root
-POSTGRES_PASSWORD=root
-POSTGRES_DB=database_name
-DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} 
+VARIABLE_NAME = "example
 
 etc
 ```
@@ -66,7 +62,7 @@ After Docker containers are running, you can create a virtual environment, insta
 Once this is done for the first time, you can start with step 3 to activate the already created venv, and you only need to install requirements when there has been a change or addition
 Depending on your setup, you may also be able to navigate directly to your repo, and run step 5, which may trigger your .venv automatically 
 
-## Package Changes
+## 📦 Package Changes
 
 Any new packages should be added to the `requirements.in` file, and then run the command `make requirements` to generate a new requirements.txt file with appropriate versioning
 
@@ -84,12 +80,12 @@ When changes occur in the `requirements.txt` file, you will need to run `docker 
 `make stop`: stop containers
 `make remove`: remove Docker containers and volumes
 
-## Database & Migration
+## 📊 Database & Migration
 
 Running the project via the `make` command also runs PostGreSQL via Docker. As noted above, `make open-adminer` will open a GUI to inspect and manage the database
 The initial SQL script is found within `support/docker/pg/init.sql` and this will need to be modified from the template for the actual `database_name` (remove this note when template is utilized)
 
-## Migration
+## 🛸 Migration
 By default, the folder `alembic/versions` should be included here. If it is not, be sure to run `mkdir alembic/versions` so that migrations can be created
 **To create new migration:** Run `make migration name=name_of_your_migration` *This will generate a new file inside `alembic/versions` which must be edited before proceeding*
 **To apply new migration:** Run `make migrate` *This will apply the migration*
