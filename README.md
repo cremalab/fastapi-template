@@ -70,15 +70,15 @@ When changes occur in the `requirements.txt` file, you will need to run `docker 
 
 ## 🗒️ Commands
 
-`make requirements`: runs pip-compile to generate a new requirements.txt file based on packages listed in requirements.in
-`make linting`: runs Black for linting
-`make pytest`: runs unit tests
-`make open-adminer`: opens Adminer GUI for DB management
-`make logs-all`: runs logs for all docker containers
-`make logs-redis`: runs logs for redis container
-`make logs-worker`: runs logs for both worker containers
-`make stop`: stop containers
-`make remove`: remove Docker containers and volumes
+- `make requirements`: runs pip-compile to generate a new requirements.txt file based on packages listed in requirements.in
+- `make linting`: runs Black for linting
+- `make pytest`: runs unit tests
+- `make open-adminer`: opens Adminer GUI for DB management
+- `make logs-all`: runs logs for all docker containers
+- `make logs-redis`: runs logs for redis container
+- `make logs-worker`: runs logs for both worker containers
+- `make stop`: stop containers
+- `make remove`: remove Docker containers and volumes
 
 ## 📊 Database & Migration
 
