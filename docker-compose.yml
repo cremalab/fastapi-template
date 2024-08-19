@@ -1,0 +1,110 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+      - ./support/docker/pg/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - ./config/.env
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 3005:8080
+    depends_on:
+      - postgres
+  
+  redis:
+    image: redis:7
+    volumes:
+      - redis-data:/data
+    command: ["--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+
+  venv:
+    image: python:3.12
+    volumes:
+      - .:$PWD
+    working_dir: $PWD
+    command:
+      - /bin/bash
+      - -c
+      - |
+        if [ -d ".venv" ]
+        then
+            source .venv/bin/activate
+        else
+            echo "creating venv"
+            python3 -m venv .venv
+        fi
+        source .venv/bin/activate && pip install -r requirements.txt
+
+  app: &app
+    env_file:
+      - ./config/.env
+    image: python:3.12
+    volumes:
+      - .:$PWD
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      venv:
+        condition: service_completed_successfully
+    working_dir: $PWD
+    environment:
+      - PYTHONUNBUFFERED=1 #ensures console logs to container 
+    command: $PWD/run_server
+
+  worker: &worker
+    <<: *app
+    ports: []
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CELERY_BROKER=redis://redis:6379/14
+      - CELERY_BACKEND=redis://redis:6379/15
+      - POSTGRES_HOST=postgres
+    working_dir: $PWD
+    command: $PWD/run_worker
+
+  worker-beat:
+    <<: *worker
+    working_dir: $PWD
+    entrypoint: $PWD/run_beat
+
+  migration:
+    <<: *worker
+    command:
+      - /bin/bash
+      - -c
+      - |
+        source .venv/bin/activate
+        alembic upgrade head
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
